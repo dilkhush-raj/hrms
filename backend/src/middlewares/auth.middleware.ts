@@ -8,18 +8,23 @@ const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
   if (!token) {
     return res.status(401).json({
       status: 'error',
-      message: 'Access token and refresh token are required',
+      message: 'Authentication required',
     });
   }
 
   try {
-    const decodedAccessToken = jwt.verify(
-      token,
-      // @ts-ignore
-      process.env.ACCESS_TOKEN_SECRET
-    );
+    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || '';
+    const decodedAccessToken = jwt.verify(token, accessTokenSecret);
 
-    const user = await User.findById(decodedAccessToken.id);
+    let user = null;
+
+    if (
+      decodedAccessToken &&
+      typeof decodedAccessToken !== 'string' &&
+      'id' in decodedAccessToken
+    ) {
+      user = await User.findById(decodedAccessToken.id);
+    }
 
     if (!user) {
       return res.status(401).json({
@@ -28,7 +33,6 @@ const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
-    // @ts-ignore
     req.user = user;
 
     next();

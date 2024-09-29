@@ -107,8 +107,13 @@ UserSchema.methods.generateAccessToken = async function () {
     role: this.role,
   };
 
+  const expiresIn =
+    this.role === 'hr'
+      ? 'process.env.HR_ACCESS_TOKEN_EXPIRY'
+      : 'process.env.ACCESS_TOKEN_EXPIRY';
+
   return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!, {
-    expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    expiresIn: expiresIn,
   });
 };
 
