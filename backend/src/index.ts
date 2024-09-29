@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import {app} from './app';
 import connectDB from './db/index';
+import '../types/express/index.d.ts';
 
 dotenv.config({});
 
