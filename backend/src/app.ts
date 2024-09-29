@@ -2,14 +2,18 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import cookiePraser from 'cookie-parser';
-import {authRoutes, verifyRoutes} from './routes';
+import {authRoutes, userRoutes, verifyRoutes} from './routes';
 
 const app = express();
 
 // App Setup
 app.use(
   cors({
-    origin: '*',
+    origin: [
+      'http://localhost:3000',
+      'https://hrms-sand.vercel.app',
+      'https://hrms.dilkhushraj.me',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   })
@@ -25,6 +29,7 @@ app.use(cookiePraser());
 // Routes setup
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/verify', verifyRoutes);
+app.use('/api/v1/users', userRoutes);
 app.get('/ping', (req, res) => {
   res.status(200).json({success: true, message: 'pong'});
 });

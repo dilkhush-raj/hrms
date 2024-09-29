@@ -280,4 +280,63 @@ const updateUserRole = async (req: Request, res: Response) => {
   }
 };
 
-export {createUser, loginUser, deleteUser, changePassword, updateUserRole};
+const logOutUser = async (req: Request, res: Response) => {
+  try {
+    const {_id} = req.user;
+    const user = await User.findByIdAndUpdate(
+      _id,
+      {
+        $unset: {refreshToken: 1},
+      },
+      {new: true}
+    );
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    return res
+      .status(200)
+      .clearCookie('accessToken', options)
+      .clearCookie('refreshToken', options)
+      .json({
+        status: 'success',
+        user: null,
+      });
+  } catch (error) {
+    return res.status(500).json({error: 'Failed to log out user'});
+  }
+};
+
+const isLoggedIn = async (req: Request, res: Response) => {
+  try {
+    const {_id} = req.user;
+
+    if (!_id) {
+      return res.status(200).json({success: false, message: 'User not found'});
+    }
+
+    const user = await User.findById(_id).select('-password');
+
+    if (!user) {
+      return res.status(200).json({success: false, message: 'User not found'});
+    }
+
+    return res.status(200).json({success: true, user});
+  } catch (error) {
+    return res
+      .status(500)
+      .json({error: 'Failed to check if user is logged in'});
+  }
+};
+
+export {
+  createUser,
+  loginUser,
+  deleteUser,
+  changePassword,
+  updateUserRole,
+  logOutUser,
+  isLoggedIn,
+};

@@ -109,8 +109,8 @@ UserSchema.methods.generateAccessToken = async function () {
 
   const expiresIn =
     this.role === 'hr'
-      ? 'process.env.HR_ACCESS_TOKEN_EXPIRY'
-      : 'process.env.ACCESS_TOKEN_EXPIRY';
+      ? process.env.HR_ACCESS_TOKEN_EXPIRY
+      : process.env.ACCESS_TOKEN_EXPIRY;
 
   return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET!, {
     expiresIn: expiresIn,
