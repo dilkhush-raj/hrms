@@ -1,0 +1,107 @@
+.sidebar {
+  background-color: #f9fafb;
+  z-index: 50;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  transition: all 0.5s;
+  width: 280px;
+}
+
+.sidebar-closed {
+  left: -100%;
+}
+
+.sidebar-open {
+  left: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 1rem;
+  padding-right: 1.5rem;
+}
+
+.sidebar-logo {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.sidebar-logo-image {
+  height: 3rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sidebar-logo-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.sidebar-close-button {
+  display: none;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-category {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-category-label {
+  color: #4b5563;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+  font-weight: 300;
+}
+
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sidebar-link {
+  position: relative;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-link-active {
+  background-color: #552dab;
+  border-top-right-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+  height: 100%;
+  width: 0.5rem;
+  position: absolute;
+  left: 0;
+}
+
+.sidebar-link-content {
+  display: flex;
+  gap: 1rem;
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    left: 0;
+  }
+
+  .sidebar-close-button {
+    display: none;
+  }
+}
