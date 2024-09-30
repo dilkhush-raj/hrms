@@ -5,6 +5,7 @@ import {
   Routes,
   Navigate,
   Outlet,
+  Link,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Dashboard from "./pages/Dashboard";
@@ -20,7 +21,11 @@ import Sidebar from "./components/Sidebar";
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
-  return isAuthenticated && !isLoading ? children : <>Login Please</>;
+  return isAuthenticated && !isLoading ? (
+    children
+  ) : (
+    <Link to="/login">Login Please</Link>
+  );
 };
 
 const Layout = () => {

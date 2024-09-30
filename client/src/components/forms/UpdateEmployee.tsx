@@ -141,6 +141,20 @@ export default function EmployeeForm({
               />
             </div>
             <div className="input-group">
+              <label htmlFor="phoneNumber" className="input-label">
+                Phone Number*
+              </label>
+              <input
+                type="number"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="input-group">
               <label className="input-label">Active Status</label>
               <input
                 type="checkbox"

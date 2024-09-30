@@ -81,10 +81,7 @@ const getAllUsers = async (req: Request, res: Response): Promise<void> => {
 const updateusers = async (req: Request, res: Response): Promise<void> => {
   try {
     const {id} = req.params;
-    const {name, email, phone, position, joiningDate} = req.body;
-    console.log(name, email, phone, position, joiningDate);
-
-    console.log(id);
+    const {name, email, phoneNumber, position, joiningDate} = req.body;
 
     if (!id) {
       throw res.status(400).json({error: 'Missing required fields'});
@@ -96,7 +93,7 @@ const updateusers = async (req: Request, res: Response): Promise<void> => {
         $set: {
           name,
           email,
-          phone,
+          phoneNumber,
           position,
           joiningDate,
         },

@@ -110,7 +110,7 @@ export default function EmployeeTable() {
         </div>
       </div>
       <div className="table-container">
-        <table className="employees-table">
+        <table className="candidates-table">
           <thead>
             <tr>
               <th>Sr no.</th>
@@ -131,7 +131,6 @@ export default function EmployeeTable() {
                 <td>{employee.phoneNumber}</td>
                 <td>{employee.position}</td>
                 <td>{employee.department}</td>
-                <td>{new Date(employee.dateOfJoining).toLocaleDateString()}</td>
                 <td>
                   <button onClick={() => handleUpdateClick(employee)}>
                     <Edit className="icon" />

@@ -106,7 +106,7 @@ export default function AttendanceTable() {
         </div>
       </div>
       <div className="table-container">
-        <table className="attendance-table">
+        <table className="candidates-table">
           <thead>
             <tr>
               <th>Sr no.</th>
