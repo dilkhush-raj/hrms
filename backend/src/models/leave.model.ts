@@ -4,7 +4,7 @@ interface ILeave extends Document {
   date: Date;
   reason: string;
   status: 'Pending' | 'Approved' | 'Rejected';
-  document: string;
+  documents: string;
   user: Types.ObjectId;
 }
 
@@ -17,7 +17,10 @@ const LeaveSchema = new Schema<ILeave>(
       enum: ['Pending', 'Approved', 'Rejected'],
       default: 'Pending',
     },
-    document: {type: String},
+    documents: {
+      type: String,
+      required: true,
+    },
     user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
   },
   {
@@ -25,4 +28,4 @@ const LeaveSchema = new Schema<ILeave>(
   }
 );
 
-export const Leave = model('Otp', LeaveSchema);
+export const Leave = model('leave', LeaveSchema);

@@ -1,20 +1,23 @@
 import { Bell, CircleUser, Mail, Menu } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 interface NavbarProps {
   toggleSidebar: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
+  const location = useLocation();
+  const pathname = location.pathname.split("/")[1];
   return (
     <>
       <nav className="navbar">
         <div className="left-nav">
-          <button onClick={toggleSidebar} className="flex md:hidden gap-4">
+          <div onClick={toggleSidebar} className="menu-btn">
             <Menu />
-          </button>
-          <h1 className="capitalize text-2xl font-semibold"></h1>
+          </div>
+          <h1 className="nav-title">{pathname}</h1>
         </div>
-        <div className="flex gap-4">
+        <div style={{ display: "flex", gap: "1rem" }}>
           <Mail />
           <Bell />
           <CircleUser />

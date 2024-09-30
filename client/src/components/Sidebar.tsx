@@ -9,6 +9,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
 interface SidebarProps {
   toggleSidebar: () => void;
@@ -16,7 +17,9 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ toggleSidebar, isOpen }: SidebarProps) {
-  const pathname = "";
+  const location = useLocation();
+  const pathname = location.pathname;
+
   const { logout } = useAuth();
   const links = [
     {
@@ -63,9 +66,9 @@ export default function Sidebar({ toggleSidebar, isOpen }: SidebarProps) {
           <img src="/logo.png" alt="Logo" className="sidebar-logo-image" />
           <div className="sidebar-logo-text">HRMS</div>
         </a>
-        <button onClick={toggleSidebar} className="sidebar-close-button">
+        <div onClick={toggleSidebar} className="sidebar-close-button">
           <X />
-        </button>
+        </div>
       </div>
       <div className="sidebar-content">
         {links.map((category, index) => (
@@ -74,13 +77,18 @@ export default function Sidebar({ toggleSidebar, isOpen }: SidebarProps) {
             <div className="sidebar-links">
               {category.links.map((link, index) => (
                 <div key={index} className="sidebar-link">
-                  {pathname.startsWith(link.link) && (
+                  {pathname == link.link ? (
                     <div className="sidebar-link-active"></div>
-                  )}
-                  <a href={link.link} className="sidebar-link-content">
+                  ) : null}
+
+                  <Link
+                    to={link.link}
+                    onClick={toggleSidebar}
+                    className="sidebar-link-content"
+                  >
                     {link.icon}
                     {link.label}
-                  </a>
+                  </Link>
                 </div>
               ))}
             </div>
@@ -90,7 +98,17 @@ export default function Sidebar({ toggleSidebar, isOpen }: SidebarProps) {
           <h3 className="sidebar-category-label">Others</h3>
           <div className="sidebar-links">
             <div className="sidebar-link">
-              <div onClick={logout} className="sidebar-link-content cursor">
+              <div
+                style={{
+                  cursor: "pointer",
+                }}
+                onClick={() => {
+                  if (window.confirm("Do you want to log out?")) {
+                    logout();
+                  }
+                }}
+                className="sidebar-link-content "
+              >
                 <LogOut />
                 Log Out
               </div>

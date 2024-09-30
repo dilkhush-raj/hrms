@@ -1,5 +1,11 @@
+import CandidateTable from "../components/CandidateTable";
+
 function Candidates() {
-  return <div>Candidates</div>;
+  return (
+    <div>
+      <CandidateTable />
+    </div>
+  );
 }
 
 export default Candidates;

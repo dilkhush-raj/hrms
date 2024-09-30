@@ -32,7 +32,7 @@ const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
         message: 'Invalid access token',
       });
     }
-
+    // @ts-ignore
     req.user = user;
 
     next();

@@ -110,12 +110,9 @@
 
 .navbar {
   display: flex;
-  padding-left: 2rem;
-  padding-right: 2rem;
-  padding-right: 3rem;
+  padding: 5px 5px;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   height: 80px;
 }
@@ -137,6 +134,24 @@
 
 .layout {
   @media (min-width: 768px) {
-    margin-left: 280px;
+    padding-left: 280px;
   }
+}
+
+.menu-btn {
+  display: block;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.flex {
+  display: flex;
+  gap: 1rem;
+}
+
+.capitalize {
+  text-transform: capitalize;
 }

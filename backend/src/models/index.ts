@@ -1,6 +1,6 @@
 import {Otp} from './otp.model';
 import {User} from './user.model';
-import {Employee} from './employee.model';
-import {Candidate} from './candidate.model';
+import {Leave} from './leave.model';
+import {Attend} from './attend.model';
 
-export {Otp, User, Employee, Candidate};
+export {Otp, User, Leave, Attend};

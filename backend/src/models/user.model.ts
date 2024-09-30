@@ -28,7 +28,6 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
     },
     phoneNumber: {
       type: String,
@@ -48,8 +47,38 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    position: {
+      type: String,
+    },
+
+    //candidate fields
+    status: {
+      type: String,
+      enum: ['New', 'Scheduled', 'Selected', 'Rejected'],
+      default: 'New',
+    },
+    experience: {
+      type: Number,
+    },
+    resume: {
+      type: String,
+    },
+    //employee fields
+    department: {
+      type: String,
+      required: function (this: any) {
+        return this.role === 'employee';
+      },
+    },
+    joiningDate: {
+      type: Date,
+    },
   },
-  userBaseOptions
+
+  {
+    timestamps: true,
+  }
 );
 
 UserSchema.pre('save', async function (next) {
@@ -57,6 +86,7 @@ UserSchema.pre('save', async function (next) {
   if (!user.isModified('password')) return next();
 
   const salt = await bcrypt.genSalt(10);
+  // @ts-ignore
   user.password = await bcrypt.hash(user.password, salt);
   next();
 });

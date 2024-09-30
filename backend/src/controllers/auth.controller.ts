@@ -63,8 +63,6 @@ const createUser = async (req: Request, res: Response) => {
     return res.status(409).json({error: 'User already exists'});
   }
 
-  // Hash password
-
   // Create new user
   const newUser = await User.create({
     name: name,

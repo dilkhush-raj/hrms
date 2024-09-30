@@ -5,10 +5,14 @@ function Dashboard() {
 
   return (
     <div className="p-4">
-      <div className="font-medium text-xl">
+      <h1>
         Welcome, <span className="capitalize ">{user?.name}</span>
-      </div>
-      <img src="/dashboard.png" className="w-full" alt="" />
+      </h1>
+      <p>
+        You are logged in as a <b>{user?.role}</b> user and your email is:{" "}
+        <b>{user?.email}</b>
+      </p>
+      <img src="/dashboard.png" width={"100%"} alt="" />
     </div>
   );
 }
