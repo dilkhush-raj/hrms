@@ -1,5 +1,5 @@
 function Leaves() {
-  return <div>Leaves</div>;
+  return <div></div>;
 }
 
 export default Leaves;

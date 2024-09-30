@@ -3,34 +3,34 @@ import { X } from "lucide-react";
 import "../../styles/CandidateForm.css";
 import axios from "axios";
 
-export default function CandidateForm({
+export default function AddNewLeaveForm({
   toggleModal,
 }: {
   toggleModal: () => void;
 }) {
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
-    phone: "",
-    position: "",
-    role: "candidate",
-    status: "New",
-    experience: 0,
-    resume: "",
+    date: "",
+    reason: "",
+    documents: "",
+    status: "Pending", // Default status
   });
   const [declaration, setDeclaration] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const apiUrl = `${
     import.meta.env.VITE_BACKEND_HOST_URL
-  }/api/v1/users/createuser`;
+  }/api/v1/leaves/create`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
       const response = await axios.post(apiUrl, formData, {
         withCredentials: true,
@@ -40,12 +40,12 @@ export default function CandidateForm({
       });
 
       if (response.status === 201) {
-        console.log("Candidate created successfully:", response.data);
+        console.log("Leave request created successfully:", response.data);
         toggleModal();
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        console.error("Error creating candidate:", error.response.data);
+        console.error("Error creating leave request:", error.response.data);
       } else {
         console.error("Unexpected error:", error);
       }
@@ -56,27 +56,13 @@ export default function CandidateForm({
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
-          <h2 className="modal-title">Add New Candidate</h2>
+          <h2 className="modal-title">Add New Leave Request</h2>
           <button onClick={toggleModal} className="close-button">
             <X className="w-6 h-6" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="form-container">
           <div className="input-grid">
-            <div className="input-group">
-              <label htmlFor="name" className="input-label">
-                Full Name*
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="input-field"
-                required
-              />
-            </div>
             <div className="input-group">
               <label htmlFor="email" className="input-label">
                 Email Address*
@@ -92,62 +78,44 @@ export default function CandidateForm({
               />
             </div>
             <div className="input-group">
-              <label htmlFor="phone" className="input-label">
-                Phone Number*
+              <label htmlFor="date" className="input-label">
+                Leave Date*
               </label>
               <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
+                type="date"
+                id="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="input-group full-width">
+              <label htmlFor="reason" className="input-label">
+                Reason for Leave*
+              </label>
+              <textarea
+                id="reason"
+                name="reason"
+                value={formData.reason}
                 onChange={handleChange}
                 className="input-field"
                 required
               />
             </div>
             <div className="input-group">
-              <label htmlFor="position" className="input-label">
-                Department*
+              <label htmlFor="documents" className="input-label">
+                Supporting Documents (URL)
               </label>
               <input
-                type="text"
-                id="position"
-                name="position"
-                value={formData.position}
+                type="url"
+                id="documents"
+                name="documents"
+                value={formData.documents}
                 onChange={handleChange}
                 className="input-field"
-                required
               />
-            </div>
-            <div className="input-group">
-              <label htmlFor="experience" className="input-label">
-                Experience*
-              </label>
-              <input
-                type="number"
-                id="experience"
-                name="experience"
-                value={formData.experience}
-                onChange={handleChange}
-                className="input-field"
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label htmlFor="resume" className="input-label">
-                Resume Link*
-              </label>
-              <div className="mt-1 flex items-center">
-                <input
-                  type="text"
-                  id="resume"
-                  name="resume"
-                  value={formData.resume}
-                  onChange={handleChange}
-                  className="input-field"
-                  required
-                />
-              </div>
             </div>
           </div>
           <div className="checkbox-group">
@@ -159,16 +127,16 @@ export default function CandidateForm({
               className="checkbox"
             />
             <label htmlFor="declaration" className="checkbox-label">
-              <br />
-              I hereby declare that the above information is true to the best of
-              my knowledge and belief
-              <br />
+              I hereby declare that the above information is true and correct.
             </label>
           </div>
-          <br />
           <div className="flex justify-center">
-            <button type="submit" className="submit-button">
-              Save
+            <button
+              type="submit"
+              className="submit-button"
+              disabled={!declaration}
+            >
+              Submit Leave Request
             </button>
           </div>
         </form>

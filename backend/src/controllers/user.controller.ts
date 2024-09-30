@@ -10,23 +10,12 @@ const createUsers = async (req: Request, res: Response): Promise<void> => {
       phone,
       role,
       status = 'New',
-      experience,
+      experience = 0,
       resume,
       position,
     } = req.body;
 
-    if (
-      !name ||
-      !email ||
-      !phone ||
-      !position ||
-      !role ||
-      !experience ||
-      !resume
-    ) {
-      res.status(400).json({error: 'Missing required fields'});
-      return;
-    }
+    console.log(req.body);
 
     const isemailexist = await User.findOne({email});
 
@@ -35,10 +24,10 @@ const createUsers = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     const newUser = new User({
-      name,
-      email,
+      name: name,
+      email: email,
       phoneNumber: phone,
-      position,
+      position: position,
       role,
       status,
       experience,
@@ -92,21 +81,12 @@ const getAllUsers = async (req: Request, res: Response): Promise<void> => {
 const updateusers = async (req: Request, res: Response): Promise<void> => {
   try {
     const {id} = req.params;
-    const {name, email, phone, role, position, joiningDate, department} =
-      req.body;
+    const {name, email, phone, position, joiningDate} = req.body;
+    console.log(name, email, phone, position, joiningDate);
+
+    console.log(id);
 
     if (!id) {
-      throw res.status(400).json({error: 'Missing required fields'});
-    }
-    if (
-      !name ||
-      !email ||
-      !phone ||
-      !position ||
-      !role ||
-      !department ||
-      !joiningDate
-    ) {
       throw res.status(400).json({error: 'Missing required fields'});
     }
     //convert candidate to employee
@@ -117,8 +97,6 @@ const updateusers = async (req: Request, res: Response): Promise<void> => {
           name,
           email,
           phone,
-          role,
-          department,
           position,
           joiningDate,
         },

@@ -36,7 +36,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: ['candidate', 'employee', 'hr', 'admin'],
       default: 'candidate',
-      required: true,
     },
     refreshToken: {type: String},
     isActive: {
@@ -55,7 +54,6 @@ const UserSchema = new mongoose.Schema(
     //candidate fields
     status: {
       type: String,
-      enum: ['New', 'Scheduled', 'Selected', 'Rejected'],
       default: 'New',
     },
     experience: {
@@ -67,9 +65,6 @@ const UserSchema = new mongoose.Schema(
     //employee fields
     department: {
       type: String,
-      required: function (this: any) {
-        return this.role === 'employee';
-      },
     },
     joiningDate: {
       type: Date,

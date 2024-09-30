@@ -1,5 +1,11 @@
+import AttendanceTable from "../components/AttendanceTable";
+
 function Attendance() {
-  return <div>Attendance</div>;
+  return (
+    <div>
+      <AttendanceTable />
+    </div>
+  );
 }
 
 export default Attendance;

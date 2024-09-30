@@ -1,22 +1,38 @@
 import React, { useState } from "react";
-import { X, Upload } from "lucide-react";
+import { X } from "lucide-react";
 import "../../styles/CandidateForm.css";
+import axios from "axios";
 
-export default function EmployeeForm() {
+interface Employee {
+  _id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  position: string;
+  department: string;
+  dateOfJoining: string;
+}
+
+interface EmployeeFormProps {
+  toggleModal: () => void;
+  employee: Employee;
+}
+
+export default function EmployeeForm({
+  toggleModal,
+  employee,
+}: EmployeeFormProps) {
   const [formData, setFormData] = useState({
-    _id: "66f9aa89b40a2f07399187ae",
-    name: "prateek",
-    email: "test@1267gmail.com",
+    _id: employee._id,
+    name: employee.name,
+    email: employee.email,
+    phoneNumber: employee.phoneNumber,
     role: "employee",
     isActive: true,
-    emailVerified: false,
-    position: "tech lead",
-    status: "New",
+    position: employee.position,
     experience: 1,
-    resume: "jksbajkbnkjabskjsbh",
     tasks: [],
-    joiningDate: "2024-09-29T18:22:18.771+00:00",
-    department: "backend developer",
+    joiningDate: "",
   });
 
   const handleChange = (
@@ -30,9 +46,31 @@ export default function EmployeeForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const apiUrl = `${
+    import.meta.env.VITE_BACKEND_HOST_URL
+  }/api/v1/users/updateUser/${employee._id}`;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+    try {
+      const response = await axios.put(apiUrl, formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.status === 201) {
+        console.log("Candidate created successfully:", response.data);
+        toggleModal();
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        console.error("Error creating candidate:", error.response.data);
+      } else {
+        console.error("Unexpected error:", error);
+      }
+    }
   };
 
   return (
@@ -40,7 +78,7 @@ export default function EmployeeForm() {
       <div className="modal-container">
         <div className="modal-header">
           <h2 className="modal-title">Update Employee Information</h2>
-          <button className="close-button">
+          <button onClick={toggleModal} className="close-button">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -89,20 +127,6 @@ export default function EmployeeForm() {
               />
             </div>
             <div className="input-group">
-              <label htmlFor="department" className="input-label">
-                Department*
-              </label>
-              <input
-                type="text"
-                id="department"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                className="input-field"
-                required
-              />
-            </div>
-            <div className="input-group">
               <label htmlFor="experience" className="input-label">
                 Experience (Years)*
               </label>
@@ -111,56 +135,6 @@ export default function EmployeeForm() {
                 id="experience"
                 name="experience"
                 value={formData.experience}
-                onChange={handleChange}
-                className="input-field"
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label htmlFor="resume" className="input-label">
-                Resume
-              </label>
-              <div className="mt-1 flex items-center">
-                <input
-                  type="text"
-                  id="resume"
-                  name="resume"
-                  value={formData.resume}
-                  onChange={handleChange}
-                  className="input-field"
-                />
-                <button type="button" className="upload-button">
-                  <Upload className="w-5 h-5 text-purple-600" />
-                </button>
-              </div>
-            </div>
-            <div className="input-group">
-              <label htmlFor="status" className="input-label">
-                Status*
-              </label>
-              <select
-                id="status"
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="input-field"
-                required
-              >
-                <option value="New">New</option>
-                <option value="Active">Active</option>
-                <option value="On Leave">On Leave</option>
-                <option value="Resigned">Resigned</option>
-              </select>
-            </div>
-            <div className="input-group">
-              <label htmlFor="joiningDate" className="input-label">
-                Joining Date*
-              </label>
-              <input
-                type="date"
-                id="joiningDate"
-                name="joiningDate"
-                value={formData.joiningDate.split("T")[0]}
                 onChange={handleChange}
                 className="input-field"
                 required

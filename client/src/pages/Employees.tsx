@@ -1,5 +1,11 @@
+import EmployeeTable from "../components/EmployeeTable";
+
 function Employees() {
-  return <div>Employees</div>;
+  return (
+    <div>
+      <EmployeeTable />
+    </div>
+  );
 }
 
 export default Employees;

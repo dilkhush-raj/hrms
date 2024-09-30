@@ -10,7 +10,6 @@ const attendSchema = new Schema<IAttend>(
   {
     taskStatus: {
       type: String,
-      required: true,
     },
 
     status: {

@@ -2,9 +2,9 @@ import {Request, Response} from 'express';
 import {Attend} from '../models';
 
 const createAttend = async (req: Request, res: Response) => {
-  const {task, status} = req.body;
+  const {task, status, id} = req.body;
 
-  if (!task || !status) {
+  if (!task || !status || !id) {
     return res
       .status(400)
       .json({error: 'Date, User ID and Status are required'});
@@ -14,7 +14,7 @@ const createAttend = async (req: Request, res: Response) => {
     const attend = await Attend.create({
       task,
       status,
-      user: req.user._id,
+      user: id,
     });
 
     return res.status(201).json({success: true, attend});
