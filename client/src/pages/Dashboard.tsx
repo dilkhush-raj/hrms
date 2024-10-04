@@ -9,8 +9,14 @@ function Dashboard() {
         Welcome, <span className="capitalize ">{user?.name}</span>
       </h1>
       <p>
-        You are logged in as a <b>{user?.role}</b> user and your email is:{" "}
-        <b>{user?.email}</b>
+        <span>
+          Your role is <span className="uppercase">{user?.role}</span>
+        </span>
+        <br />
+        <span>
+          Your email is <span className="">{user?.email}</span>
+        </span>
+        <br />
       </p>
       <img src="/dashboard.png" width={"100%"} alt="" />
     </div>

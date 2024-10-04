@@ -17,15 +17,42 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import Spinner from "./components/Spinner";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
-  return isAuthenticated && !isLoading ? (
-    children
-  ) : (
-    <Link to="/login">Login Please</Link>
-  );
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  // If user is not authenticated, show login prompt
+  if (!isAuthenticated) {
+    return (
+      <div className="center h-screen">
+        <p>You are not authenticated. Please</p> <Link to="/login">Login</Link>
+      </div>
+    );
+  }
+
+  if (user?.role !== "hr" && user?.role !== "admin") {
+    return (
+      <Routes>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="*"
+          element={
+            <div className="center h-screen">
+              <p>You are not authorized to view this page.</p>
+            </div>
+          }
+        />
+      </Routes>
+    );
+  }
+
+  // Allow access to all routes if user is "hr" or "admin"
+  return children;
 };
 
 const Layout = () => {
