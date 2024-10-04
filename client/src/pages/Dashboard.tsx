@@ -18,7 +18,7 @@ function Dashboard() {
         </span>
         <br />
       </p>
-      <img src="/dashboard.png" width={"100%"} alt="" />
+      {/* <img src="/dashboard.png" width={"100%"} alt="" /> */}
     </div>
   );
 }

@@ -58,7 +58,7 @@ export default function CandidateForm({
         <div className="modal-header">
           <h2 className="modal-title">Add New Candidate</h2>
           <button onClick={toggleModal} className="close-button">
-            <X className="w-6 h-6" />
+            <X className="w-6 h-6 text-white" />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="form-container">
@@ -107,7 +107,7 @@ export default function CandidateForm({
             </div>
             <div className="input-group">
               <label htmlFor="position" className="input-label">
-                Department*
+                Position*
               </label>
               <input
                 type="text"

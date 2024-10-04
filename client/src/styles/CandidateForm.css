@@ -6,6 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  z-index: 1000;
 }
 
 .modal-container {

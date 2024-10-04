@@ -153,14 +153,14 @@ const getCandidateUsers = async (
   res: Response
 ): Promise<void> => {
   try {
-    const {page = 0, limit = 10, sort = 'createdAt'} = req.query;
+    const {page = 1, limit = 10, sort = 'createdAt'} = req.query;
     const filter = {role: 'candidate'};
     const sortField = typeof sort === 'string' ? sort : 'createdAt';
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
 
     const users = await User.find(filter)
-      .skip(pageNumber * limitNumber)
+      .skip((pageNumber - 1) * limitNumber) // Adjusted skip calculation
       .limit(limitNumber)
       .sort({[sortField]: -1})
       .populate('role');
@@ -178,6 +178,7 @@ const getCandidateUsers = async (
     res.status(500).json({success: false, error: 'Failed to get all users'});
   }
 };
+
 const getEmployeeUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const {page = 0, limit = 10, sort = 'createdAt', role} = req.query;
@@ -206,6 +207,79 @@ const getEmployeeUsers = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const getUserById = async (req: Request, res: Response) => {
+  try {
+    const {id} = req.params;
+    const user = await User.findById(id).select('-refreshToken -password');
+    if (!user) {
+      res.status(404).json({error: 'User not found'});
+      return;
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error in getUserById:', error);
+    res.status(500).json({error: 'Failed to get user by id'});
+  }
+};
+
+const updateUserStatus = async (req: Request, res: Response) => {
+  try {
+    const {id} = req.params;
+    const {status} = req.body;
+    const user = await User.findById(id);
+    if (!user) {
+      res.status(404).json({error: 'User not found'});
+      return;
+    }
+    user.status = status;
+    await user.save();
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error in updateUserStatus:', error);
+    res.status(500).json({error: 'Failed to update user status'});
+  }
+};
+
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    const {id} = req.params;
+    const {
+      name,
+      email,
+      phoneNumber,
+      role,
+      position,
+      status,
+      experience,
+      resume,
+      department,
+      joiningDate,
+    } = req.body;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({error: 'User not found'});
+    }
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+    user.role = role || user.role;
+    user.position = position || user.position;
+    user.status = status || user.status;
+    user.experience = experience || user.experience;
+    user.resume = resume || user.resume;
+    user.department = department || user.department;
+    user.joiningDate = joiningDate || user.joiningDate;
+
+    await user.save();
+
+    res.status(200).json({message: 'User updated successfully', user});
+  } catch (error) {
+    console.error('Error in updateUser:', error);
+    res.status(500).json({error: 'Failed to update user'});
+  }
+};
+
 export {
   getAllUsers,
   getCandidateUsers,
@@ -213,4 +287,7 @@ export {
   createUsers,
   updateusers,
   deleteUser,
+  getUserById,
+  updateUserStatus,
+  updateUser,
 };

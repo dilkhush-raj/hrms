@@ -18,7 +18,7 @@ th {
 .filter-select {
   padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 400px;
 }
 
 .search-box {
@@ -26,7 +26,7 @@ th {
   align-items: center;
   border: 1px solid #ccc;
   padding: 5px 10px;
-  border-radius: 4px;
+  border-radius: 400px;
 }
 
 .search-box input {
@@ -46,7 +46,7 @@ th {
   color: #fff;
   padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 100px;
   cursor: pointer;
 }
 
@@ -54,13 +54,11 @@ th {
   background-color: #5a3ba6;
 }
 
-.table-container {
-  overflow-x: auto;
-}
-
 .candidates-table {
   width: 100%;
   border-collapse: collapse;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .candidates-table th,
@@ -96,4 +94,116 @@ th {
   background: none;
   border: none;
   cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.pagination button {
+  padding: 0.2rem 0.5rem;
+  background-color: #6b46c1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #d2d2d2;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: 500;
+}
+
+.items-per-page {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  margin-left: 1rem;
+}
+
+.status-cell {
+  position: relative;
+}
+
+.status-dropdown {
+  position: relative;
+}
+
+.status-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.status-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.status-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  z-index: 10;
+}
+
+.status-options button {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-options button:hover {
+  background-color: #f7fafc;
+}
+
+.status-options button.active {
+  font-weight: 500;
+}
+
+.status-options button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.status-options button.new {
+  color: #000;
+}
+
+.status-options button.scheduled {
+  color: #5c30b5;
+}
+
+.status-options button.selected {
+  color: #388e3c;
+}
+
+.status-options button.rejected {
+  color: #d32f2f;
 }

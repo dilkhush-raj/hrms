@@ -58,6 +58,7 @@ const UserSchema = new mongoose.Schema(
     },
     experience: {
       type: Number,
+      default: 0,
     },
     resume: {
       type: String,
