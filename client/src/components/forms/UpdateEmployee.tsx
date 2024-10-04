@@ -204,9 +204,9 @@ export default function EmployeeForm({
                 className="input-field"
                 required
               >
+                <option value="candidate">Candidate</option>
                 <option value="employee">Employee</option>
                 <option value="hr">HR</option>
-                <option value="manager">Manager</option>
               </select>
             </div>
             <div className="input-group">
