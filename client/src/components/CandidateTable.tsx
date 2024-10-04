@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Search, Download, Trash2, ChevronDown, Edit } from "lucide-react";
+import { Search, Download, Trash2, Edit } from "lucide-react";
 import "../styles/CandidateTable.css";
 import axios from "axios";
 import CandidateForm from "./forms/NewCandidate";
@@ -43,9 +43,6 @@ export default function CandidateTable() {
     currentPage: 1,
     totalPages: 1,
   });
-  const [activeStatusDropdown, setActiveStatusDropdown] = useState<
-    string | null
-  >(null);
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   const apiUrl = `${
@@ -68,8 +65,6 @@ export default function CandidateTable() {
           currentPage,
           totalPages,
         });
-
-        // Extract unique positions
         const uniquePositions = Array.from(
           new Set(users.map((user: Candidate) => user.position).filter(Boolean))
         );
@@ -145,21 +140,14 @@ export default function CandidateTable() {
       );
 
       if (response.status === 200) {
-        setCandidates(
-          candidates.map((candidate) =>
-            candidate._id === userId
-              ? { ...candidate, status: newStatus }
-              : candidate
-          )
-        );
-
         console.log(`Status updated successfully to ${newStatus}`);
+        // Re-fetch candidates to get updated data from the API
+        await fetchCandidates();
       }
     } catch (error) {
       console.error("Error updating status:", error);
     } finally {
       setUpdatingStatus(null);
-      setActiveStatusDropdown(null);
     }
   };
 
@@ -229,9 +217,9 @@ export default function CandidateTable() {
         </div>
       </div>
 
-      <div className="overflow-x-auto min-h-[80vh] ">
+      <div className="overflow-x-auto  ">
         <div className="table-container ">
-          <table className="candidates-table ">
+          <table className="candidates-table pb-[100px] ">
             <thead>
               <tr>
                 <th>Sr no.</th>
@@ -260,42 +248,35 @@ export default function CandidateTable() {
                   <td className="whitespace-nowrap">{candidate?.position}</td>
                   <td className="status-cell">
                     <div className="status-dropdown">
-                      <button
-                        className={`status-button ${getStatusColor(
-                          candidate.status
-                        )}`}
-                        onClick={() =>
-                          setActiveStatusDropdown(
-                            activeStatusDropdown === candidate._id
-                              ? null
-                              : candidate._id
-                          )
+                      <select
+                        value={
+                          updatingStatus === candidate._id
+                            ? "Updating..."
+                            : candidate.status
+                        }
+                        onChange={(e) =>
+                          // @ts-expect-error ignore
+                          handleStatusChange(candidate._id, e.target.value)
                         }
                         disabled={updatingStatus === candidate._id}
+                        className={`status-select ${getStatusColor(
+                          candidate.status
+                        )}`}
                       >
-                        {updatingStatus === candidate._id
-                          ? "Updating..."
-                          : candidate.status}{" "}
-                        <ChevronDown className="icon" />
-                      </button>
-                      {activeStatusDropdown === candidate._id && (
-                        <div className="status-options">
-                          {STATUS_OPTIONS.map((status) => (
-                            <button
+                        {updatingStatus === candidate._id ? (
+                          <option>Updating...</option>
+                        ) : (
+                          STATUS_OPTIONS.map((status) => (
+                            <option
                               key={status}
-                              onClick={() =>
-                                handleStatusChange(candidate._id, status)
-                              }
-                              className={`${status.toLowerCase()} ${
-                                status === candidate.status ? "active" : ""
-                              }`}
-                              disabled={updatingStatus === candidate._id}
+                              value={status}
+                              className={status.toLowerCase()}
                             >
                               {status}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                            </option>
+                          ))
+                        )}
+                      </select>
                     </div>
                   </td>
                   <td>{candidate?.experience}</td>
@@ -320,11 +301,6 @@ export default function CandidateTable() {
               ))}
             </tbody>
           </table>
-
-          <p className="flex flex-wrap mt-4">
-            * Use <Edit className="icon" /> to update a user (specifically
-            moving a candidate to an employee or HR)
-          </p>
         </div>
       </div>
     </div>

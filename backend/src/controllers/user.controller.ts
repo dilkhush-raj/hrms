@@ -231,7 +231,13 @@ const updateUserStatus = async (req: Request, res: Response) => {
       res.status(404).json({error: 'User not found'});
       return;
     }
-    user.status = status;
+    if (status === 'Selected') {
+      user.role = 'employee';
+      user.status = status;
+    } else {
+      user.status = status;
+    }
+
     await user.save();
     res.status(200).json(user);
   } catch (error) {
