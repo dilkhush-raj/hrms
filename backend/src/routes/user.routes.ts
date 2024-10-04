@@ -10,6 +10,7 @@ import {
   getUserById,
   updateUserStatus,
   updateUser,
+  updateEmployee,
 } from '../controllers/user.controller';
 
 const router = Router();
@@ -22,5 +23,6 @@ router.route('/user/:id').get(getUserById);
 router.route('/updateUser/:id').put(verifyJWT, updateusers);
 router.route('/deleteUser/:id').delete(verifyJWT, deleteUser);
 router.route('/update/:id').put(updateUser);
+router.route('/update-employees/:id').put(verifyJWT, updateEmployee);
 
 export default router;

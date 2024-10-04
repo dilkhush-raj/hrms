@@ -286,6 +286,41 @@ const updateUser = async (req: Request, res: Response) => {
   }
 };
 
+const updateEmployee = async (req: Request, res: Response) => {
+  try {
+    const {id} = req.params;
+    const {
+      name,
+      email,
+      phoneNumber,
+      position,
+      department,
+      joiningDate,
+      role,
+      experience,
+    } = req.body;
+    const employee = await User.findById(id);
+    if (!employee) {
+      return res.status(404).json({error: 'Employee not found'});
+    }
+    employee.name = name || employee.name;
+    employee.email = email || employee.email;
+    employee.phoneNumber = phoneNumber || employee.phoneNumber;
+    employee.position = position || employee.position;
+    employee.department = department || employee.department;
+    employee.joiningDate = joiningDate || employee.joiningDate;
+    employee.role = role || employee.role;
+    employee.experience = experience || employee.experience;
+
+    await employee.save();
+
+    res.status(200).json({message: 'Employee updated successfully', employee});
+  } catch (error) {
+    console.error('Error in updateEmployee:', error);
+    res.status(500).json({error: 'Failed to update employee'});
+  }
+};
+
 export {
   getAllUsers,
   getCandidateUsers,
@@ -296,4 +331,5 @@ export {
   getUserById,
   updateUserStatus,
   updateUser,
+  updateEmployee,
 };

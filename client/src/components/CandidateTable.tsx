@@ -141,7 +141,7 @@ export default function CandidateTable() {
 
       if (response.status === 200) {
         console.log(`Status updated successfully to ${newStatus}`);
-        // Re-fetch candidates to get updated data from the API
+
         await fetchCandidates();
       }
     } catch (error) {

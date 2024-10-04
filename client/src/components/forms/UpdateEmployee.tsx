@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import "../../styles/CandidateForm.css";
 import axios from "axios";
 
@@ -10,48 +10,62 @@ interface Employee {
   phoneNumber: string;
   position: string;
   department: string;
-  dateOfJoining: string;
+  joiningDate: string;
+  role: string;
+  experience: number;
 }
 
 interface EmployeeFormProps {
   toggleModal: () => void;
   employee: Employee;
+  onUpdateSuccess?: () => void;
 }
 
 export default function EmployeeForm({
   toggleModal,
   employee,
+  onUpdateSuccess,
 }: EmployeeFormProps) {
+  const formatDate = (isoDate: string) => {
+    if (!isoDate) return "";
+    return new Date(isoDate).toISOString().split("T")[0];
+  };
   const [formData, setFormData] = useState({
     _id: employee._id,
     name: employee.name,
     email: employee.email,
     phoneNumber: employee.phoneNumber,
-    role: "employee",
-    isActive: true,
     position: employee.position,
-    experience: 1,
-    tasks: [],
-    joiningDate: "",
+    department: employee.department || "",
+    joiningDate: formatDate(employee.joiningDate),
+    role: employee.role || "employee",
+    experience: employee.experience || 0,
   });
+
+  const [submissionState, setSubmissionState] = useState<
+    "idle" | "submitting" | "success" | "error"
+  >("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    // @ts-expect-error checked
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
   const apiUrl = `${
     import.meta.env.VITE_BACKEND_HOST_URL
-  }/api/v1/users/updateUser/${employee._id}`;
+  }/api/v1/users/update-employees/${employee._id}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmissionState("submitting");
+    setErrorMessage("");
+
     try {
       const response = await axios.put(apiUrl, formData, {
         withCredentials: true,
@@ -60,14 +74,24 @@ export default function EmployeeForm({
         },
       });
 
-      if (response.status === 201) {
-        console.log("Candidate created successfully:", response.data);
-        toggleModal();
+      if (response.status === 200 || response.status === 201) {
+        setSubmissionState("success");
+        if (onUpdateSuccess && typeof onUpdateSuccess === "function") {
+          onUpdateSuccess();
+        }
+        setTimeout(() => {
+          toggleModal();
+        }, 500);
       }
     } catch (error) {
+      setSubmissionState("error");
       if (axios.isAxiosError(error) && error.response) {
-        console.error("Error creating candidate:", error.response.data);
+        setErrorMessage(
+          error.response.data.message || "Error updating employee"
+        );
+        console.error("Error updating employee:", error.response.data);
       } else {
+        setErrorMessage("An unexpected error occurred");
         console.error("Unexpected error:", error);
       }
     }
@@ -86,7 +110,7 @@ export default function EmployeeForm({
           <div className="input-grid">
             <div className="input-group">
               <label htmlFor="name" className="input-label">
-                Full Name*
+                Name*
               </label>
               <input
                 type="text"
@@ -113,6 +137,20 @@ export default function EmployeeForm({
               />
             </div>
             <div className="input-group">
+              <label htmlFor="phoneNumber" className="input-label">
+                Phone Number*
+              </label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="input-group">
               <label htmlFor="position" className="input-label">
                 Position*
               </label>
@@ -125,6 +163,51 @@ export default function EmployeeForm({
                 className="input-field"
                 required
               />
+            </div>
+            <div className="input-group">
+              <label htmlFor="department" className="input-label">
+                Department*
+              </label>
+              <input
+                type="text"
+                id="department"
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label htmlFor="joiningDate" className="input-label">
+                Date Joined*
+              </label>
+              <input
+                type="date"
+                id="joiningDate"
+                name="joiningDate"
+                value={formData.joiningDate}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label htmlFor="role" className="input-label">
+                Role*
+              </label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="input-field"
+                required
+              >
+                <option value="employee">Employee</option>
+                <option value="hr">HR</option>
+                <option value="manager">Manager</option>
+              </select>
             </div>
             <div className="input-group">
               <label htmlFor="experience" className="input-label">
@@ -140,38 +223,35 @@ export default function EmployeeForm({
                 required
               />
             </div>
-            <div className="input-group">
-              <label htmlFor="phoneNumber" className="input-label">
-                Phone Number*
-              </label>
-              <input
-                type="number"
-                id="phoneNumber"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                className="input-field"
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label className="input-label">Active Status</label>
-              <input
-                type="checkbox"
-                id="isActive"
-                name="isActive"
-                checked={formData.isActive}
-                onChange={handleChange}
-                className="checkbox"
-              />
-              <label htmlFor="isActive" className="checkbox-label">
-                Is Active
-              </label>
-            </div>
           </div>
-          <div className="flex justify-center">
-            <button type="submit" className="submit-button">
-              Update Employee
+          <div className="flex flex-col items-center justify-center mt-4">
+            {submissionState === "error" && (
+              <p className="text-red-500 mb-2">{errorMessage}</p>
+            )}
+            {submissionState === "success" && (
+              <p className="text-green-500 mb-2">
+                Employee updated successfully!
+              </p>
+            )}
+            <button
+              type="submit"
+              className={`submit-button flex items-center justify-center ${
+                submissionState === "submitting"
+                  ? "opacity-70 cursor-not-allowed"
+                  : ""
+              }`}
+              disabled={submissionState === "submitting"}
+            >
+              {submissionState === "submitting" ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Updating...
+                </>
+              ) : submissionState === "success" ? (
+                "Updated!"
+              ) : (
+                "Update Employee"
+              )}
             </button>
           </div>
         </form>
