@@ -38,7 +38,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/verify', verifyRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/task', attendRoute);
-app.use('/api/v1/leaves', leaveRoutes);
+app.use('/api/v1/leave', leaveRoutes);
 
 // Health check
 app.get('/ping', (req, res) => {

@@ -3,12 +3,10 @@ import {Leave} from '../models/leave.model';
 import {User} from '../models/user.model';
 
 const createLeave = async (req: Request, res: Response) => {
-  const {email, date, reason, documents, status} = req.body;
+  const {email, leaveDate, reason, documentLink} = req.body;
 
-  if (!email || !date || !reason || !documents || !status) {
-    return res
-      .status(400)
-      .json({error: 'Email, Date and reason are required fields.'});
+  if (!email || !leaveDate || !reason || !documentLink) {
+    return res.status(400).json({error: 'Missing required fields.'});
   }
 
   const user = await User.findOne({email});
@@ -21,10 +19,9 @@ const createLeave = async (req: Request, res: Response) => {
 
   try {
     const newLeave = await Leave.create({
-      date,
+      date: new Date(leaveDate),
       reason,
-      status,
-      documents,
+      documents: documentLink,
       user: userId,
     });
 
@@ -52,7 +49,7 @@ const getAllLeaves = async (req: Request, res: Response) => {
       .sort({[sortField]: -1})
       .populate({
         path: 'user',
-        select: 'name email ',
+        select: '-password -refreshToken -isActive',
       });
 
     return res.status(200).json({success: true, leaves});
@@ -161,6 +158,83 @@ const deleteLeave = async (req: Request, res: Response) => {
   }
 };
 
+const updateLeaveStatus = async (req: Request, res: Response) => {
+  const {id} = req.params;
+  const {status} = req.body;
+
+  if (!id) {
+    return res.status(400).json({error: 'Leave ID is required'});
+  }
+
+  if (!status) {
+    return res.status(400).json({error: 'Status is required'});
+  }
+
+  try {
+    const leave = await Leave.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          status,
+        },
+      },
+      {new: true}
+    );
+
+    if (!leave) {
+      return res.status(404).json({error: 'Leave not found'});
+    }
+
+    return res.status(200).json({success: true, leave});
+  } catch (error) {
+    console.error('Error updating leave:', error);
+    return res.status(500).json({error: 'Failed to update leave'});
+  }
+};
+
+const getLeaveCalendar = async (req: Request, res: Response) => {
+  const {date} = req.query;
+
+  try {
+    let query = {
+      status: 'Approved',
+      // date: {
+      //   $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+      //   $lte: new Date(new Date().setHours(23, 59, 59, 999)),
+      // },
+    };
+
+    if (date) {
+      const targetDate = new Date(date as string);
+      const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
+
+      query = {
+        ...query,
+        // date: {
+        //   $gte: startOfDay,
+        //   $lte: endOfDay,
+        // },
+      };
+    }
+
+    const leaves = await Leave.find(query)
+      .populate({
+        path: 'user',
+        select: 'name',
+      })
+      .sort({date: 1});
+
+    return res.status(200).json({
+      success: true,
+      leaves: leaves,
+    });
+  } catch (error) {
+    console.error('Error getting leave calendar:', error);
+    return res.status(500).json({error: 'Failed to get leave calendar'});
+  }
+};
+
 export {
   createLeave,
   getAllLeaves,
@@ -168,4 +242,6 @@ export {
   getLeavesbydates,
   updateLeave,
   deleteLeave,
+  updateLeaveStatus,
+  getLeaveCalendar,
 };

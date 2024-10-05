@@ -1,7 +1,7 @@
-// import AddNewLeaveForm from "../components/forms/LeaveForm";
+import LeaveTable from "../components/LeaveTable";
 
 function Leaves() {
-  return <div>{/* <AddNewLeaveForm toggleModal={() => null} /> */}</div>;
+  return <LeaveTable />;
 }
 
 export default Leaves;
