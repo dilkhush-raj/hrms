@@ -160,6 +160,7 @@ const loginUser = async (req: Request, res: Response) => {
 const deleteUser = async (req: Request, res: Response) => {
   try {
     const {email} = req.body;
+    // @ts-ignore
     const currentUser = req.user;
 
     const isAdmin = currentUser.role === 'admin' || currentUser.role === 'hr';
@@ -225,6 +226,7 @@ const changePassword = async (req: Request, res: Response) => {
 const updateUserRole = async (req: Request, res: Response) => {
   try {
     const {email, newRole} = req.body;
+    // @ts-ignore
     const currentUser = req.user;
 
     // Check if the current user is HR or Admin
@@ -280,6 +282,7 @@ const updateUserRole = async (req: Request, res: Response) => {
 
 const logOutUser = async (req: Request, res: Response) => {
   try {
+    // @ts-ignore
     const {_id} = req.user;
     const user = await User.findByIdAndUpdate(
       _id,
@@ -309,6 +312,7 @@ const logOutUser = async (req: Request, res: Response) => {
 
 const isLoggedIn = async (req: Request, res: Response) => {
   try {
+    // @ts-ignore
     const {_id} = req.user;
 
     if (!_id) {

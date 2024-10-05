@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
       "target": "ES6",
-      "module": "commonjs",
+      "module": "CommonJS",
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
@@ -18,6 +18,6 @@
       "./types",
       "./node_modules/@types",
     ] ,
-    "include": ["src/**/*.ts", "src/types/**/*.d.ts"],
+    "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "dist"]
   }
