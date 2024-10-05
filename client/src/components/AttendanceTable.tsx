@@ -1,134 +1,228 @@
-import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
-import "../styles/CandidateTable.css";
+import { useState, useEffect, useCallback } from "react";
+import { Trash2 } from "lucide-react";
 import axios from "axios";
+import "../styles/CandidateTable.css";
+import TaskForm from "./forms/AttendanceForm";
 
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-}
+type Status = "present" | "absent" | "medical-leave" | "work-from-home";
 
 interface Attendance {
   _id: string;
-  status: string;
-  user: User;
+  task: string;
+  status: Status;
+  user: {
+    _id: string;
+    name: string;
+    position: string;
+    department: string;
+  };
 }
 
+interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+}
+
+const ITEMS_PER_PAGE = 200;
+const STATUS_OPTIONS: Status[] = [
+  "present",
+  "absent",
+  "medical-leave",
+  "work-from-home",
+];
+
 export default function AttendanceTable() {
-  const [attendances, setAttendances] = useState<Attendance[]>([]);
-  const [filteredAttendances, setFilteredAttendances] = useState<Attendance[]>(
-    []
-  );
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [searchTerm, setSearchTerm] = useState("");
-  const apiUrl = `${import.meta.env.VITE_BACKEND_HOST_URL}/api/v1/attendance`;
+  const [attendanceList, setAttendanceList] = useState<Attendance[]>([]);
+  const [filteredAttendanceList, setFilteredAttendanceList] = useState<
+    Attendance[]
+  >([]);
+  const [departmentFilter, setDepartmentFilter] = useState("All");
+  const [departments, setDepartments] = useState<string[]>([]);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    currentPage: 1,
+    totalPages: 1,
+  });
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch attendances from backend
-  useEffect(() => {
-    const fetchAttendances = async () => {
-      try {
-        const response = await axios.get(apiUrl, {
-          withCredentials: true,
+  const apiUrl = `${
+    import.meta.env.VITE_BACKEND_HOST_URL
+  }/api/v1/task/attendance`;
+
+  const fetchAttendanceList = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}?page=${pagination.currentPage}&limit=${ITEMS_PER_PAGE}`,
+        { withCredentials: true }
+      );
+      if (response.status === 200) {
+        const { attends, currentPage, totalPages } = response.data;
+        setAttendanceList(attends);
+        setFilteredAttendanceList(attends);
+        setPagination({
+          currentPage,
+          totalPages,
         });
-        if (response.status === 200) {
-          const attendances = response.data.attendances;
-          setAttendances(attendances);
-          setFilteredAttendances(attendances);
-          console.log(response);
-        }
-      } catch (error) {
-        console.error("Error fetching attendances:", error);
-      }
-    };
 
-    fetchAttendances();
-  }, [apiUrl]);
+        const uniqueDepartments = Array.from(
+          new Set(
+            attends.map((attendance: Attendance) => attendance.user.department)
+          )
+        );
+        setDepartments(uniqueDepartments as string[]);
+      }
+    } catch (error) {
+      console.error("Error fetching attendance data:", error);
+    }
+  }, [apiUrl, pagination.currentPage]);
 
   useEffect(() => {
-    filterAttendances();
-  }, [attendances, statusFilter, searchTerm]);
+    fetchAttendanceList();
+  }, [fetchAttendanceList]);
 
-  const filterAttendances = () => {
-    let filtered = attendances;
-    if (statusFilter !== "All") {
-      filtered = filtered.filter(
-        (attendance) =>
-          attendance.status.toLowerCase() === statusFilter.toLowerCase()
+  useEffect(() => {
+    const filterAttendance = () => {
+      let filtered = attendanceList;
+
+      if (departmentFilter !== "All") {
+        filtered = filtered.filter(
+          (attendance) => attendance.user.department === departmentFilter
+        );
+      }
+
+      setFilteredAttendanceList(filtered);
+    };
+    filterAttendance();
+  }, [attendanceList, departmentFilter]);
+
+  const handleStatusChange = async (taskId: string, newStatus: Status) => {
+    setUpdatingStatus(taskId);
+    try {
+      const response = await axios.put(
+        `${
+          import.meta.env.VITE_BACKEND_HOST_URL
+        }/api/v1/task/updateAttendenceStatus/${taskId}`,
+        { status: newStatus },
+        { withCredentials: true }
       );
+
+      if (response.status === 200) {
+        console.log(`Status updated successfully to ${newStatus}`);
+        await fetchAttendanceList();
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+    } finally {
+      setUpdatingStatus(null);
     }
-    if (searchTerm) {
-      filtered = filtered.filter((attendance) =>
-        Object.values(attendance.user).some((value) =>
-          value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    }
-    setFilteredAttendances(filtered);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "present":
-        return "status-present";
-      case "absent":
-        return "status-absent";
-      case "late":
-        return "status-late";
-      default:
-        return "";
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      if (!window.confirm("Are you sure you want to delete this user?")) {
+        return;
+      }
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_HOST_URL}/api/v1/task/delete/${taskId}`,
+        { withCredentials: true }
+      );
+      await fetchAttendanceList();
+    } catch (error) {
+      console.error("Error deleting task:", error);
     }
   };
 
   return (
     <div className="container">
       <div className="header">
-        <div className="flex">
-          <select
-            className="filter-select"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+        <select
+          className="filter-select"
+          value={departmentFilter}
+          onChange={(e) => setDepartmentFilter(e.target.value)}
+        >
+          <option value="All">All Departments</option>
+          {departments.map((department) => (
+            <option key={department} value={department}>
+              {department}
+            </option>
+          ))}
+        </select>
+        <div>
+          <button
+            onClick={() => setIsModalOpen(!isModalOpen)}
+            className="add-btn whitespace-nowrap"
           >
-            <option value="All">All</option>
-            <option value="Present">Present</option>
-            <option value="Absent">Absent</option>
-            <option value="Late">Late</option>
-          </select>
-          <div className="search-box">
-            <Search className="icon" />
-            <input
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+            Add Task
+          </button>
         </div>
       </div>
-      <div className="table-container">
-        <table className="candidates-table">
-          <thead>
-            <tr>
-              <th>Sr no.</th>
-              <th>Employee Name</th>
-              <th>Email Address</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredAttendances?.map((attendance, index) => (
-              <tr
-                key={attendance._id}
-                className={getStatusColor(attendance.status) + " cursor"}
-              >
-                <td>{index + 1}</td>
-                <td>{attendance.user.name}</td>
-                <td>{attendance.user.email}</td>
-                <td>{attendance.status}</td>
+
+      {isModalOpen && (
+        <TaskForm
+          toggleModal={() => setIsModalOpen(false)}
+          onTaskAdded={fetchAttendanceList}
+        />
+      )}
+
+      <div className="overflow-x-auto">
+        <div className="table-container">
+          <table className="candidates-table">
+            <thead>
+              <tr>
+                <th>Sr no.</th>
+                <th>Employee Name</th>
+                <th>Position</th>
+                <th>Department</th>
+                <th>Task</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredAttendanceList?.map((attendance, index) => (
+                <tr key={attendance._id} className="cursor">
+                  <td>{index + 1}</td>
+                  <td>{attendance.user.name}</td>
+                  <td>{attendance.user.position}</td>
+                  <td>{attendance.user.department}</td>
+                  <td>{attendance.task}</td>
+                  <td className="status-cell">
+                    <select
+                      value={
+                        updatingStatus === attendance._id
+                          ? "Updating..."
+                          : attendance.status
+                      }
+                      onChange={(e) =>
+                        handleStatusChange(
+                          attendance._id,
+                          e.target.value as Status
+                        )
+                      }
+                      disabled={updatingStatus === attendance._id}
+                      className="status-select"
+                    >
+                      {updatingStatus === attendance._id ? (
+                        <option>Updating...</option>
+                      ) : (
+                        STATUS_OPTIONS.map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </td>
+                  <td>
+                    <button onClick={() => handleDeleteTask(attendance._id)}>
+                      <Trash2 className="icon" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

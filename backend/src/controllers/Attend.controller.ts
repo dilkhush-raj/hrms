@@ -1,20 +1,30 @@
 import {Request, Response} from 'express';
-import {Attend} from '../models';
+import {Attend, User} from '../models';
 
 const createAttend = async (req: Request, res: Response) => {
-  const {task, status, id} = req.body;
+  const {task, status, email, date} = req.body;
+  console.log(task, status, email, date);
 
-  if (!task || !status || !id) {
+  if (!task || !status || !email || !date) {
     return res
       .status(400)
-      .json({error: 'Date, User ID and Status are required'});
+      .json({error: 'Date, User email and Status are required'});
   }
+
+  const user = await User.findOne({email});
+
+  if (!user) {
+    return res.status(404).json({error: 'User not found'});
+  }
+
+  const userId = user?._id;
 
   try {
     const attend = await Attend.create({
       task,
       status,
-      user: id,
+      user: userId,
+      date: new Date(date),
     });
 
     return res.status(201).json({success: true, attend});
@@ -98,4 +108,44 @@ const updateAttend = async (req: Request, res: Response) => {
   }
 };
 
-export {createAttend, getAttends, deleteAttend, updateAttend};
+const updateAttendStatus = async (req: Request, res: Response) => {
+  const {id} = req.params;
+  const {status} = req.body;
+
+  if (!id) {
+    return res.status(400).json({error: 'Attend ID is required'});
+  }
+
+  if (!status) {
+    return res.status(400).json({error: 'Status is required'});
+  }
+
+  try {
+    const attend = await Attend.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          status,
+        },
+      },
+      {new: true}
+    );
+
+    if (!attend) {
+      return res.status(404).json({error: 'Attend not found'});
+    }
+
+    return res.status(200).json({success: true, attend});
+  } catch (error) {
+    console.error('Error updating attend:', error);
+    return res.status(500).json({error: 'Failed to update attend'});
+  }
+};
+
+export {
+  createAttend,
+  getAttends,
+  deleteAttend,
+  updateAttend,
+  updateAttendStatus,
+};
