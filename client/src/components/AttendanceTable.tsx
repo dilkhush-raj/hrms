@@ -66,7 +66,9 @@ export default function AttendanceTable() {
 
         const uniqueDepartments = Array.from(
           new Set(
-            attends.map((attendance: Attendance) => attendance.user.department)
+            attends.map(
+              (attendance: Attendance) => attendance?.user?.department
+            )
           )
         );
         setDepartments(uniqueDepartments as string[]);
@@ -86,7 +88,7 @@ export default function AttendanceTable() {
 
       if (departmentFilter !== "All") {
         filtered = filtered.filter(
-          (attendance) => attendance.user.department === departmentFilter
+          (attendance) => attendance?.user?.department === departmentFilter
         );
       }
 
@@ -182,27 +184,27 @@ export default function AttendanceTable() {
               {filteredAttendanceList?.map((attendance, index) => (
                 <tr key={attendance._id} className="cursor">
                   <td>{index + 1}</td>
-                  <td>{attendance.user.name}</td>
-                  <td>{attendance.user.position}</td>
-                  <td>{attendance.user.department}</td>
-                  <td>{attendance.task}</td>
+                  <td>{attendance.user?.name}</td>
+                  <td>{attendance.user?.position}</td>
+                  <td>{attendance.user?.department}</td>
+                  <td>{attendance?.task}</td>
                   <td className="status-cell">
                     <select
                       value={
-                        updatingStatus === attendance._id
+                        updatingStatus === attendance?._id
                           ? "Updating..."
-                          : attendance.status
+                          : attendance?.status
                       }
                       onChange={(e) =>
                         handleStatusChange(
-                          attendance._id,
+                          attendance?._id,
                           e.target.value as Status
                         )
                       }
-                      disabled={updatingStatus === attendance._id}
+                      disabled={updatingStatus === attendance?._id}
                       className="status-select"
                     >
-                      {updatingStatus === attendance._id ? (
+                      {updatingStatus === attendance?._id ? (
                         <option>Updating...</option>
                       ) : (
                         STATUS_OPTIONS.map((status) => (
@@ -214,7 +216,7 @@ export default function AttendanceTable() {
                     </select>
                   </td>
                   <td>
-                    <button onClick={() => handleDeleteTask(attendance._id)}>
+                    <button onClick={() => handleDeleteTask(attendance?._id)}>
                       <Trash2 className="icon" />
                     </button>
                   </td>
